@@ -1,0 +1,17 @@
+{% comment %}
+  Tweet Embed Include
+  
+  Usage: {% include tweet.html tweet_id="1973969815418384514" %}
+  
+  Parameters:
+  - tweet_id: The tweet ID from the URL (required)
+  - theme: "light" or "dark" (optional, defaults to "light")
+  - width: Width of the embed (optional, defaults to "100%")
+  - align: "left", "center", or "right" (optional, defaults to "center")
+{% endcomment %}
+
+<div class="tweet-embed" style="text-align: {{ include.align | default: 'center' }}; margin: 20px 0;">
+  <blockquote class="twitter-tweet" data-theme="{{ include.theme | default: 'light' }}" data-width="{{ include.width | default: '100%' }}">
+    <a href="https://twitter.com/x/status/{{ include.tweet_id }}"></a>
+  </blockquote>
+</div>

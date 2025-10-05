@@ -1,0 +1,129 @@
+---
+---
+
+@import "minima";
+
+/* Responsive multi-column layout */
+.page-content .wrapper {
+  column-count: 1;
+  column-gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 600px) {
+  .page-content .wrapper {
+    column-count: 2;
+  }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 900px) {
+  .page-content .wrapper {
+    column-count: 3;
+  }
+}
+
+/* Card styling - header and list stay together as one card */
+.page-content h2 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px 12px 0 0;
+  padding: 15px 20px;
+  margin: 20px 0 0 0;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  font-weight: 600;
+  font-size: 1.3em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  break-inside: avoid;
+  break-after: avoid;
+}
+
+.page-content h2:first-child {
+  margin-top: 0;
+}
+
+.page-content h2 + ul {
+  background-color: #ffffff;
+  border: 1px solid #e1e5e9;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 15px 20px;
+  margin: 0 0 20px 0;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  list-style: none;
+  break-inside: avoid;
+  break-before: avoid;
+}
+
+.page-content h2 + ul li {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.page-content h2 + ul li:last-child {
+  border-bottom: none;
+}
+
+.page-content h2 + ul li a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.page-content h2 + ul li a:hover {
+  color: #667eea;
+}
+
+/* YouTube embed - stays in one column, no breaking */
+.youtube-embed {
+  background-color: #ffffff;
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  margin: 0 0 20px 0;
+  break-inside: avoid;
+  display: block;
+  position: relative;
+  height: 0;
+  padding-bottom: calc(56.25% + 40px); /* 16:9 aspect ratio + padding */
+  overflow: hidden;
+}
+
+.youtube-embed iframe {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: calc(100% - 40px);
+  height: calc(100% - 40px);
+  border: none;
+  border-radius: 8px;
+}
+
+/* Twitter/X embed - stays in one column, no breaking */
+.tweet-embed {
+  background-color: #ffffff;
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  margin: 0 0 20px 0;
+  break-inside: avoid;
+  display: block;
+}
+
+.tweet-embed blockquote {
+  margin: 0 !important;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  width: 100%;
+  max-width: 100%;
+}
