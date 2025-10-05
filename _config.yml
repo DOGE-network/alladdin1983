@@ -19,14 +19,14 @@
 # in the templates via {{ site.myvariable }}.
 
 # Template Variables (users replace these)
-state_name: "{{STATE_NAME}}"  # e.g., "Kansas"
-state_abbrev: "{{STATE_ABBREV}}"  # e.g., "KS"
-state_url_subdomain: "{{STATE_SUBDOMAIN}}"  # e.g., "kansas"
+state_name: "alladdin1983"  # e.g., "Kansas"
+state_abbrev: "ALLADDIN"  # e.g., "KS"
+state_url_subdomain: "alladdin1983"  # e.g., "kansas"
 
 # Derived Configuration (auto-generated from variables)
-title: "{{STATE_NAME}} DOGE"
-description: "{{STATE_NAME}} State DOGE Network site for government transparency and efficiency."
-url: "https://{{STATE_SUBDOMAIN}}.dogenetwork.org/"
+title: "Alladdin1983"
+description: "alladdin1983 State DOGE Network site for government transparency and efficiency."
+url: "https://alladdin1983.dogenetwork.org/"
 
 version: "0.2.0"
 template: "DOGE Network Ruby"
@@ -34,10 +34,10 @@ template_repo: "https://github.com/DOGE-network/DOGE_Network_Ruby_Template"
 last_updated: "2025-10-05"
 email: community@dogenetwork.org
 baseurl: "" # the subpath of your site, e.g. /blog
-twitter_username: cali-doge # replace with your state's twitter username
-github_username: sarob # replace with your github username
+twitter_username: alladdin1983 # replace with your state's twitter username
+github_username: alladdin1983 # replace with your github username
 logo_doge: "/doge-network.png"
-logo_state: "/state-flag.svg" # replace with your state's flag
+logo_state: "/state-flag.jpeg" # replace with your state's flag
 
 # Build settings
 theme: minima

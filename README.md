@@ -29,8 +29,7 @@ The script will ask for:
 ### 3. Install Dependencies
 
 ```bash
-gem install bundler jekyll
-bundle install --path vendor/bundle
+bundle install
 ```
 
 ### 4. Start Development Server
