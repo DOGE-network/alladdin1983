@@ -242,10 +242,10 @@ ruby sync.rb  # Choose option 4
 
 # Fetch and compare changes
 git fetch template
-git diff template/main -- _config.yml
+git diff template/master -- _config.yml
 
 # Merge specific file (after reviewing!)
-git checkout template/main -- Gemfile
+git checkout template/master -- Gemfile
 ```
 
 ## Deployment

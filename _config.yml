@@ -28,10 +28,10 @@ title: "Alladdin1983"
 description: "alladdin1983 State DOGE Network site for government transparency and efficiency."
 url: "https://alladdin1983.dogenetwork.org/"
 
-version: "0.2.0"
+version: "0.3.0"
 template: "DOGE Network Ruby"
 template_repo: "https://github.com/DOGE-network/DOGE_Network_Ruby_Template"
-last_updated: "2025-10-05"
+last_updated: "2025-10-06"
 email: community@dogenetwork.org
 baseurl: "" # the subpath of your site, e.g. /blog
 twitter_username: alladdin1983 # replace with your state's twitter username

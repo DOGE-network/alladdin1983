@@ -4,6 +4,94 @@ All notable changes to the DOGE Network Ruby Template will be documented in this
 
 State sites can use this to understand what changed between versions and decide which updates to adopt.
 
+## [0.3.0] - 2025-10-06
+
+### ✨ Added
+
+#### YouTube Embed Component
+- **`_includes/youtube.html`** - New component for embedding YouTube videos
+  - Easy to use: `{% include youtube.html id="VIDEO_ID" %}`
+  - Responsive 16:9 aspect ratio
+  - Styled to match site design
+  - Loading spinner animation
+
+#### Enhanced Tweet Embed Component
+- **Loading spinner** - Visual feedback while tweets load
+  - CSS animation for smooth spinning
+  - Consistent with YouTube loading design
+  - Improves user experience
+
+#### Template Contribution Feature
+- **Push improvements to template** - New option in `sync.rb` (option 6)
+  - Identify changes suitable for contributing back to template
+  - Interactive review of candidate files
+  - Automated contribution branch creation
+  - Manual contribution command guide
+  - Helps maintain template with improvements from state sites
+
+### 🔄 Changed
+
+#### Documentation
+- **`README.md`** - Significantly enhanced with:
+  - Better structured sections
+  - Template contribution guidelines
+  - Detailed sync.rb usage examples
+  - Improved setup instructions
+  - More comprehensive troubleshooting
+
+#### Code Quality
+- **`sync.rb`** - Improved Ruby code style
+  - Added `require "English"` for better $CHILD_STATUS handling
+  - String literals frozen with `.freeze`
+  - Consistent double quotes instead of single quotes
+  - Better error handling with `StandardError`
+  - Cleaner conditionals (`unless` instead of `if !`)
+  - Improved hash alignment and readability
+
+- **`setup.rb`** - Code style improvements
+  - Consistent string quoting
+  - Better Ruby idioms
+
+### 🗑️ Removed
+
+#### Duplicate Files
+- **`assets/css/main.scss`** - Removed duplicate SCSS file
+  - Consolidated into `assets/main.scss`
+  - Eliminates confusion about which file to edit
+  - Cleaner project structure
+
+### 📊 File Changes Summary
+
+Files modified:
+- `README.md` (+159 lines) - Enhanced documentation
+- `_includes/tweet.html` (+113 lines) - Added loading spinner
+- `sync.rb` (+555 lines) - Major improvements with contribution feature
+- `assets/main.scss` (+38 lines) - Consolidated SCSS
+- `setup.rb` (+22 lines) - Code style improvements
+
+Files added:
+- `_includes/youtube.html` (+73 lines) - New component
+
+Files removed:
+- `assets/css/main.scss` (-80 lines) - Duplicate removed
+
+### 🎯 For State Sites
+
+**Safe to merge:**
+- `_includes/tweet.html` - Loading spinner enhancement
+- `_includes/youtube.html` - New component (if you need YouTube embeds)
+- `assets/main.scss` - Consolidated SCSS (remove old `assets/css/main.scss`)
+- `sync.rb` - Tool improvements (including new push-to-template feature)
+- `setup.rb` - Code style updates
+
+**Review carefully:**
+- `README.md` - May have state-specific content, merge template improvements selectively
+
+**Action required:**
+- If you have `assets/css/main.scss`, delete it and use `assets/main.scss` instead
+
+---
+
 ## [0.2.0] - 2025-10-05
 
 ### 🎉 Major: Template System Released

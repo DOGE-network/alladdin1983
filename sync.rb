@@ -9,7 +9,7 @@ require "yaml"
 
 class TemplateSync
   TEMPLATE_REPO = "https://github.com/DOGE-network/DOGE_Network_Ruby_Template.git".freeze
-  TEMPLATE_BRANCH = "main".freeze
+  TEMPLATE_BRANCH = "master".freeze
   TEMP_DIR = ".template_temp".freeze
 
   # Files that are usually safe to merge (no state-specific content)
@@ -383,10 +383,11 @@ class TemplateSync
 
     FileUtils.rm_rf(TEMP_DIR)
 
-    system("git clone --depth 1 -b #{TEMPLATE_BRANCH} #{TEMPLATE_REPO} #{TEMP_DIR} 2>&1 | grep -v 'Cloning'")
+    clone_output, clone_status = Open3.capture2("git clone --depth 1 -b #{TEMPLATE_BRANCH} #{TEMPLATE_REPO} #{TEMP_DIR}")
 
-    unless $CHILD_STATUS.success?
+    unless clone_status.success?
       puts "❌ Failed to fetch template repository"
+      puts "Error: #{clone_output}" unless clone_output.empty?
       return
     end
 
