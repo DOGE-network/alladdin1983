@@ -2,7 +2,7 @@
 # DOGE Network Ruby Template Setup Script
 # This script helps customize the template for your state
 
-require 'fileutils'
+require "fileutils"
 
 puts "🐕 DOGE Network Ruby Template Setup"
 puts "=================================="
@@ -24,11 +24,11 @@ puts
 
 # Files to process
 files_to_update = [
-  '_config.yml',
-  'index.md',
-  'savings.md',
-  'regulations.md',
-  '_includes/header.html'
+  "_config.yml",
+  "index.md",
+  "savings.md",
+  "regulations.md",
+  "_includes/header.html",
 ]
 
 # Replace template variables
@@ -36,12 +36,12 @@ files_to_update.each do |file|
   if File.exist?(file)
     puts "Updating #{file}..."
     content = File.read(file)
-    
+
     # Replace template variables
-    content.gsub!('{{STATE_NAME}}', state_name)
-    content.gsub!('{{STATE_ABBREV}}', state_abbrev)
-    content.gsub!('{{STATE_SUBDOMAIN}}', state_subdomain)
-    
+    content.gsub!("{{STATE_NAME}}", state_name)
+    content.gsub!("{{STATE_ABBREV}}", state_abbrev)
+    content.gsub!("{{STATE_SUBDOMAIN}}", state_subdomain)
+
     File.write(file, content)
     puts "✓ #{file} updated"
   else

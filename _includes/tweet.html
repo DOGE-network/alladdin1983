@@ -10,8 +10,117 @@
   - align: "left", "center", or "right" (optional, defaults to "center")
 {% endcomment %}
 
-<div class="tweet-embed" style="text-align: {{ include.align | default: 'center' }}; margin: 20px 0;">
-  <blockquote class="twitter-tweet" data-theme="{{ include.theme | default: 'light' }}" data-width="{{ include.width | default: '100%' }}">
+<div class="tweet-embed" data-align="{{ include.align | default: 'center' }}" style="margin: 20px 0;">
+  <!-- Loading spinner -->
+  <div class="loading-spinner" id="tweet-spinner-{{ include.tweet_id }}">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading tweet...</div>
+  </div>
+  
+  <!-- Tweet content (initially hidden) -->
+  <blockquote class="twitter-tweet" data-theme="{{ include.theme | default: 'light' }}" data-width="{{ include.width | default: '100%' }}" style="display: none;">
     <a href="https://twitter.com/x/status/{{ include.tweet_id }}"></a>
   </blockquote>
 </div>
+
+<script>
+(function() {
+  const tweetId = '{{ include.tweet_id }}';
+  const tweetEmbed = document.querySelector('[data-align]');
+  const spinner = document.getElementById('tweet-spinner-' + tweetId);
+  const tweetBlock = spinner.nextElementSibling;
+  
+  // Apply alignment from data attribute
+  const align = tweetEmbed.getAttribute('data-align') || 'center';
+  tweetEmbed.style.textAlign = align;
+  
+  // Ensure spinner is visible initially
+  spinner.classList.remove('hidden');
+  spinner.style.display = 'flex';
+  spinner.style.visibility = 'visible';
+  
+  // Function to hide spinner and show tweet
+  function hideSpinnerAndShowTweet() {
+    if (spinner && !spinner.classList.contains('hidden')) {
+      spinner.classList.add('hidden');
+      spinner.style.display = 'none';
+      spinner.style.visibility = 'hidden';
+      if (tweetBlock) {
+        tweetBlock.style.display = 'block';
+      }
+    }
+  }
+  
+  // Check if Twitter script is already loaded
+  if (typeof twttr !== 'undefined' && twttr.ready) {
+    twttr.ready(function() {
+      twttr.widgets.load(tweetBlock, function() {
+        hideSpinnerAndShowTweet();
+      });
+    });
+  } else {
+    // Wait for Twitter script to load
+    function waitForTwitter() {
+      if (typeof twttr !== 'undefined' && twttr.ready) {
+        twttr.ready(function() {
+          twttr.widgets.load(tweetBlock, function() {
+            hideSpinnerAndShowTweet();
+          });
+        });
+      } else {
+        // Check again in 100ms
+        setTimeout(waitForTwitter, 100);
+      }
+    }
+    
+    // Start waiting for Twitter script
+    waitForTwitter();
+    
+    // Fallback: hide spinner after 10 seconds if Twitter script never loads
+    setTimeout(function() {
+      if (!spinner.classList.contains('hidden')) {
+        hideSpinnerAndShowTweet();
+      }
+    }, 10000);
+  }
+  
+  // Also listen for when the tweet iframe loads (additional safety)
+  tweetBlock.addEventListener('load', function() {
+    setTimeout(hideSpinnerAndShowTweet, 500);
+  });
+  
+  // Additional check: if tweet content appears, hide spinner
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'childList' && tweetBlock.children.length > 0) {
+        // Wait longer to ensure content is fully loaded
+        setTimeout(hideSpinnerAndShowTweet, 3000);
+      }
+    });
+  });
+  
+  observer.observe(tweetBlock, { childList: true, subtree: true });
+  
+  // More aggressive fallback: check for tweet content every 1000ms
+  let checkCount = 0;
+  const maxChecks = 15; // 15 seconds total
+  
+  const contentChecker = setInterval(function() {
+    checkCount++;
+    
+    // Check if tweet content has loaded (more thorough check)
+    if (tweetBlock.children.length > 0 && 
+        (tweetBlock.querySelector('iframe') || 
+         tweetBlock.innerHTML.trim().length > 100)) {
+      clearInterval(contentChecker);
+      hideSpinnerAndShowTweet();
+    }
+    
+    // Stop checking after max attempts
+    if (checkCount >= maxChecks) {
+      clearInterval(contentChecker);
+      hideSpinnerAndShowTweet(); // Hide spinner anyway
+    }
+  }, 1000);
+})();
+</script>

@@ -1,0 +1,73 @@
+{% comment %}
+  YouTube Embed Include with Loading Spinner
+  
+  Usage: {% include youtube.html video_id="dQw4w9WgXcQ" %}
+  
+  Parameters:
+  - video_id: The YouTube video ID from the URL (required)
+  - width: Width of the embed (optional, defaults to "100%")
+  - height: Height of the embed (optional, defaults to "315")
+  - align: "left", "center", or "right" (optional, defaults to "center")
+  - autoplay: "1" or "0" (optional, defaults to "0")
+  - start: Start time in seconds (optional)
+{% endcomment %}
+
+{% assign youtube_url = 'https://www.youtube.com/embed/' | append: include.video_id %}
+{% if include.start %}
+  {% assign youtube_url = youtube_url | append: '?start=' | append: include.start %}
+  {% if include.autoplay == '1' %}
+    {% assign youtube_url = youtube_url | append: '&autoplay=1' %}
+  {% endif %}
+{% elsif include.autoplay == '1' %}
+  {% assign youtube_url = youtube_url | append: '?autoplay=1' %}
+{% endif %}
+
+<div class="youtube-embed" style="text-align: {{ include.align | default: 'center' }}; margin: 20px 0;">
+  <!-- Loading spinner -->
+  <div class="loading-spinner" id="youtube-spinner-{{ include.video_id }}">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading video...</div>
+  </div>
+  
+  <!-- YouTube iframe (initially hidden) -->
+  <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none;" id="youtube-container-{{ include.video_id }}">
+    <iframe 
+      src="{{ youtube_url }}"
+      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+      width="{{ include.width | default: '100%' }}"
+      height="{{ include.height | default: '315' }}"
+      frameborder="0"
+      allowfullscreen
+      loading="lazy"
+      onload="hideYouTubeSpinner('{{ include.video_id }}')">
+    </iframe>
+  </div>
+</div>
+
+<script>
+function hideYouTubeSpinner(videoId) {
+  const spinner = document.getElementById('youtube-spinner-' + videoId);
+  const container = document.getElementById('youtube-container-' + videoId);
+  
+  if (spinner && container) {
+    spinner.style.display = 'none';
+    container.style.display = 'block';
+  }
+}
+
+// Fallback: hide spinner after 5 seconds if iframe doesn't load
+document.addEventListener('DOMContentLoaded', function() {
+  const videoId = '{{ include.video_id }}';
+  setTimeout(function() {
+    const spinner = document.getElementById('youtube-spinner-' + videoId);
+    const container = document.getElementById('youtube-container-' + videoId);
+    
+    if (spinner && spinner.style.display !== 'none') {
+      spinner.style.display = 'none';
+      if (container) {
+        container.style.display = 'block';
+      }
+    }
+  }, 5000);
+});
+</script>
