@@ -73,7 +73,7 @@ class TemplateSync
     puts "3. List file categories (safe vs. needs review)"
     puts "4. Setup template remote (for manual sync)"
     puts "5. View changelog"
-    puts "6. Push improvements to template"
+    puts "6. Create PR with diff between template and local repository"
     puts "7. Exit"
     print "\nChoice: "
 
@@ -91,7 +91,7 @@ class TemplateSync
     when "5"
       view_changelog
     when "6"
-      push_to_template
+      create_pr_with_diff
     when "7"
       puts "Exiting..."
       exit 0
@@ -215,14 +215,44 @@ class TemplateSync
   end
 
   def files_differ?(file1, file2)
-    content1 = File.read(file1)
-    content2 = File.read(file2)
+    begin
+      # Check if files are binary first
+      if binary_file?(file1) || binary_file?(file2)
+        # For binary files, compare file sizes and modification times
+        return File.size(file1) != File.size(file2) if File.exist?(file1) && File.exist?(file2)
+        return true # One exists, one doesn't
+      end
+      
+      # Try different encodings for text files
+      content1 = read_file_with_encoding(file1)
+      content2 = read_file_with_encoding(file2)
 
-    # Normalize line endings
-    content1.gsub!("\r\n", "\n")
-    content2.gsub!("\r\n", "\n")
+      # Normalize line endings
+      content1.gsub!("\r\n", "\n")
+      content2.gsub!("\r\n", "\n")
 
-    content1 != content2
+      content1 != content2
+    rescue => e
+      # If there's an encoding error, treat as different
+      puts "   Warning: Could not compare #{file1} and #{file2}: #{e.message}"
+      true
+    end
+  end
+
+  def read_file_with_encoding(file_path)
+    # Try different encodings in order of preference
+    encodings = ['UTF-8', 'ISO-8859-1', 'Windows-1252', 'US-ASCII']
+    
+    encodings.each do |encoding|
+      begin
+        return File.read(file_path, encoding: encoding)
+      rescue => e
+        next
+      end
+    end
+    
+    # If all encodings fail, read as binary and convert to string
+    File.read(file_path, mode: 'rb').force_encoding('UTF-8')
   end
 
   def compare_file
@@ -371,66 +401,299 @@ class TemplateSync
     cleanup
   end
 
-  def push_to_template
-    puts "\n📤 Push Improvements to Template"
-    puts "================================\n"
-    puts "This will help you contribute improvements back to the template."
-    puts "⚠️  Only push changes that benefit ALL state sites, not state-specific content!"
+  def create_pr_with_diff
+    puts "\n📤 Create PR with Template Repository"
+    puts "=====================================\n"
+    puts "This will open your browser to create a pull request"
+    puts "comparing your local repository with the template repository."
     puts
 
-    # Fetch template to compare
-    puts "📥 Fetching template repository..."
-
-    FileUtils.rm_rf(TEMP_DIR)
-
-    clone_output, clone_status = Open3.capture2("git clone --depth 1 -b #{TEMPLATE_BRANCH} #{TEMPLATE_REPO} #{TEMP_DIR}")
-
-    unless clone_status.success?
-      puts "❌ Failed to fetch template repository"
-      puts "Error: #{clone_output}" unless clone_output.empty?
+    # Check if we're in a git repository
+    unless Dir.exist?(".git")
+      puts "❌ Not in a git repository. Please run this from your state site directory."
       return
     end
 
-    puts "✓ Template fetched successfully\n"
-
-    # Identify candidate files for pushing
-    candidates = identify_push_candidates
-
-    if candidates.empty?
-      puts "✨ No template-appropriate changes found to push."
-      puts "   Your changes may be state-specific or already in the template."
-      cleanup
+    # Get current repository info
+    repo_info = get_repo_info
+    unless repo_info
+      puts "❌ Could not determine repository information."
       return
     end
 
-    puts "\n📋 Files with potential template improvements:"
-    candidates.each_with_index do |file, idx|
-      puts "   #{idx + 1}. #{file[:path]} (#{file[:category]})"
-    end
+    puts "📋 Repository Information:"
+    puts "   Local repo: #{repo_info[:local_repo]}"
+    puts "   Template repo: #{TEMPLATE_REPO}"
+    puts
 
-    puts "\n💡 Options:"
-    puts "1. Review changes interactively"
-    puts "2. Create contribution branch with all changes"
-    puts "3. Show git commands for manual contribution"
-    puts "4. Cancel"
-    print "\nChoice: "
+    # Get current branch name
+    current_branch = get_current_branch
+    puts "   Current branch: #{current_branch}"
+    puts
 
-    choice = gets.chomp
+    # Create PR URL
+    pr_url = "https://github.com/DOGE-network/DOGE_Network_Ruby_Template/compare/master...#{repo_info[:owner]}:#{repo_info[:repo]}:#{current_branch}?expand=1"
+    
+    puts "🌐 Opening browser to create PR..."
+    puts "   URL: #{pr_url}"
+    puts
 
-    case choice
-    when "1"
-      review_changes_interactively(candidates)
-    when "2"
-      create_contribution_branch(candidates)
-    when "3"
-      show_contribution_commands(candidates)
-    when "4"
-      puts "Cancelled."
+    # Open browser
+    if RUBY_PLATFORM =~ /darwin/
+      system("open '#{pr_url}'")
+      puts "✅ Browser opened on macOS"
+    elsif RUBY_PLATFORM =~ /linux/
+      system("xdg-open '#{pr_url}'")
+      puts "✅ Browser opened on Linux"
+    elsif RUBY_PLATFORM =~ /mswin|mingw|cygwin/
+      system("start '#{pr_url}'")
+      puts "✅ Browser opened on Windows"
     else
-      puts "Invalid choice"
+      puts "❌ Could not determine how to open browser on this platform"
+      puts "   Please manually visit: #{pr_url}"
+      return
     end
 
-    cleanup
+    puts "\n📋 Next steps:"
+    puts "   1. The browser should open to the PR creation page"
+    puts "   2. Add a title like: 'Sync changes from #{repo_info[:repo]}'"
+    puts "   3. Add a description explaining your changes"
+    puts "   4. Review the diff and submit the PR"
+    puts "\n💡 This will create a PR from your #{current_branch} branch to the template's master branch"
+  end
+
+  def get_current_branch
+    stdout, _, status = Open3.capture3("git rev-parse --abbrev-ref HEAD")
+    if status.success?
+      stdout.strip
+    else
+      "main" # fallback
+    end
+  end
+
+  def get_repo_info
+    # Get the remote origin URL
+    stdout, _, status = Open3.capture3("git remote get-url origin 2>&1")
+    
+    unless status.success?
+      puts "❌ Could not get remote origin URL. Make sure you have a remote configured."
+      return nil
+    end
+
+    origin_url = stdout.strip
+    
+    # Extract owner and repo from URL - handle both HTTPS and SSH formats
+    # Try HTTPS format first
+    if match = origin_url.match(/github\.com\/([^\/]+)\/([^\/]+?)(?:\.git)?$/)
+      owner = match[1]
+      repo = match[2]
+      return {
+        local_repo: "#{owner}/#{repo}",
+        owner: owner,
+        repo: repo,
+        origin_url: origin_url
+      }
+    # Try SSH format
+    elsif match = origin_url.match(/git@github\.com:([^\/]+)\/([^\/]+?)(?:\.git)?$/)
+      owner = match[1]
+      repo = match[2]
+      return {
+        local_repo: "#{owner}/#{repo}",
+        owner: owner,
+        repo: repo,
+        origin_url: origin_url
+      }
+    else
+      puts "❌ Could not parse GitHub repository from origin URL: #{origin_url}"
+      puts "   Expected format: https://github.com/owner/repo or git@github.com:owner/repo"
+      return nil
+    end
+  end
+
+  def generate_repo_diff
+    # Create a comprehensive diff between template and local repository
+    # This will show all differences in tracked files
+    
+    # Get list of all files in both repositories
+    local_files = get_tracked_files(".")
+    template_files = get_tracked_files(TEMP_DIR)
+    
+    all_files = (local_files + template_files).uniq.sort
+    
+    diff_parts = []
+    
+    all_files.each do |file|
+      begin
+        local_file = file
+        template_file = File.join(TEMP_DIR, file)
+        
+        # Skip if both files don't exist
+        next unless File.exist?(local_file) || File.exist?(template_file)
+        
+        # Skip if files are identical
+        if File.exist?(local_file) && File.exist?(template_file)
+          begin
+            next unless files_differ?(local_file, template_file)
+          rescue => e
+            puts "   Warning: Could not compare #{file} due to error: #{e.message}"
+            next
+          end
+        end
+        
+        # Check if file is binary
+        is_binary = binary_file?(local_file) || binary_file?(template_file)
+        
+        # Generate diff for this file
+        if File.exist?(local_file) && File.exist?(template_file)
+          # Both files exist, show diff
+          if is_binary
+            diff_parts << "diff --git a/#{file} b/#{file}"
+            diff_parts << "index #{get_file_hash(template_file)}..#{get_file_hash(local_file)}"
+            diff_parts << "Binary files differ"
+          else
+            diff_output, _ = Open3.capture2("diff -u #{template_file} #{local_file}")
+            diff_parts << "diff --git a/#{file} b/#{file}"
+            diff_parts << "index #{get_file_hash(template_file)}..#{get_file_hash(local_file)}"
+            diff_parts << "--- a/#{file}"
+            diff_parts << "+++ b/#{file}"
+            diff_parts << diff_output.split("\n")[2..-1].join("\n") if diff_output.split("\n").length > 2
+          end
+        elsif File.exist?(local_file)
+          # File only exists locally
+          diff_parts << "diff --git a/#{file} b/#{file}"
+          diff_parts << "new file mode 100644"
+          diff_parts << "index 0000000..#{get_file_hash(local_file)}"
+          diff_parts << "--- /dev/null"
+          diff_parts << "+++ b/#{file}"
+          if is_binary
+            diff_parts << "Binary file added"
+          else
+            begin
+              content = read_file_with_encoding(local_file)
+              diff_parts << "+" + content.lines.map { |line| line.chomp }.join("\n+")
+            rescue => e
+              diff_parts << "+[Binary file content]"
+            end
+          end
+        else
+          # File only exists in template
+          diff_parts << "diff --git a/#{file} b/#{file}"
+          diff_parts << "deleted file mode 100644"
+          diff_parts << "index #{get_file_hash(template_file)}..0000000"
+          diff_parts << "--- a/#{file}"
+          diff_parts << "+++ /dev/null"
+          if is_binary
+            diff_parts << "Binary file removed"
+          else
+            begin
+              content = read_file_with_encoding(template_file)
+              diff_parts << "-" + content.lines.map { |line| line.chomp }.join("\n-")
+            rescue => e
+              diff_parts << "-[Binary file content]"
+            end
+          end
+        end
+        
+        diff_parts << "" # Empty line between files
+      rescue => e
+        puts "   Warning: Skipping file #{file} due to error: #{e.message}"
+        next
+      end
+    end
+    
+    diff_parts.join("\n")
+  end
+
+  def get_tracked_files(repo_path)
+    # Get all tracked files in the repository
+    Dir.chdir(repo_path) do
+      stdout, _, status = Open3.capture3("git ls-files")
+      return [] unless status.success?
+      stdout.lines.map(&:strip)
+    end
+  end
+
+  def get_file_hash(file_path)
+    # Get a short hash for the file (simplified)
+    return "0000000" unless File.exist?(file_path)
+    
+    # Use file size and modification time as a simple hash
+    stat = File.stat(file_path)
+    "#{stat.size.to_s(16)}#{stat.mtime.to_i.to_s(16)}"[0...7]
+  end
+
+  def binary_file?(file_path)
+    return false unless File.exist?(file_path)
+    
+    # Check if file is binary by reading first 1024 bytes
+    begin
+      File.open(file_path, 'rb') do |file|
+        chunk = file.read(1024)
+        return chunk.include?("\0") || chunk.include?("\x00")
+      end
+    rescue
+      # If we can't read the file, assume it's binary
+      true
+    end
+  end
+
+  def count_different_files(diff_output)
+    # Count the number of files that have differences
+    diff_output.scan(/^diff --git/).count
+  end
+
+  def create_github_pr(repo_info, diff_output)
+    puts "\n🔧 Creating GitHub PR..."
+    
+    # Create a branch for the PR
+    timestamp = Time.now.strftime("%Y%m%d-%H%M%S")
+    branch_name = "template-diff-#{timestamp}"
+    
+    puts "📝 Creating branch: #{branch_name}"
+    
+    # Create and checkout new branch
+    system("git checkout -b #{branch_name}")
+    unless $CHILD_STATUS.success?
+      puts "❌ Failed to create branch. You may already be on a different branch."
+      return
+    end
+    
+    # Create a diff file
+    diff_file = "template-diff-#{timestamp}.patch"
+    File.write(diff_file, diff_output)
+    
+    # Add and commit the diff file
+    system("git add #{diff_file}")
+    system("git commit -m 'Add diff between template and local repository'")
+    
+    # Push the branch
+    puts "📤 Pushing branch to origin..."
+    system("git push origin #{branch_name}")
+    
+    unless $CHILD_STATUS.success?
+      puts "❌ Failed to push branch. Please check your git configuration."
+      puts "   Make sure you have push access to the repository."
+      return
+    end
+    
+    # Generate PR URL
+    pr_url = "https://github.com/#{repo_info[:local_repo]}/compare/#{branch_name}"
+    
+    puts "\n✅ Branch created and pushed successfully!"
+    puts "\n📋 Next steps:"
+    puts "   1. Visit: #{pr_url}"
+    puts "   2. Click 'Create pull request'"
+    puts "   3. Add a title like: 'Diff between template and local repository'"
+    puts "   4. Add description explaining the differences"
+    puts "   5. Submit the PR"
+    puts "\n💡 The diff file '#{diff_file}' has been included in the commit for reference."
+    
+    # Try to open the URL if possible
+    if RUBY_PLATFORM =~ /darwin/
+      system("open '#{pr_url}'")
+    elsif RUBY_PLATFORM =~ /linux/
+      system("xdg-open '#{pr_url}'")
+    end
   end
 
   def identify_push_candidates
