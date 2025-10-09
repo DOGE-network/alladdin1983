@@ -1,6 +1,6 @@
 # DOGE Network Ruby Template
 
-[![Version](https://img.shields.io/badge/Version-0.2.0-orange.svg)](https://github.com/DOGE-network/DOGE_Network_Ruby_Template)
+[![Version](https://img.shields.io/badge/Version-0.3.0-orange.svg)](https://github.com/DOGE-network/DOGE_Network_Ruby_Template)
 [![Template](https://img.shields.io/badge/Template-DOGE%20Network%20Ruby-brightgreen.svg)](https://dogenetwork.org/)
 [![Jekyll](https://img.shields.io/badge/Jekyll-4.3.4-blue.svg)](https://jekyllrb.com/)
 [![Ruby](https://img.shields.io/badge/Ruby-3.3.0-red.svg)](https://www.ruby-lang.org/)
@@ -18,10 +18,6 @@ A Jekyll template for creating state-specific DOGE Network websites. This templa
   - [Content Format](#content-format)
   - [Add New Pages](#add-new-pages)
 - [Data Sources](#data-sources)
-- [Template Updates & Syncing](#template-updates--syncing)
-  - [Sync Workflow](#sync-workflow)
-  - [Understanding File Categories](#understanding-file-categories)
-  - [Manual Sync (Advanced)](#manual-sync-advanced)
 - [Deployment](#deployment)
 - [File Structure](#file-structure)
 - [Support](#support)
@@ -104,6 +100,13 @@ To embed X posts (formerly Twitter), use:
 ```
 
 **Example:**
+The tweet ID is the unique numeric identifier at the end of a tweet URL. Here's how to extract it:
+
+[https://twitter.com/username/status/1973969815418384514](https://twitter.com/username/status/1973969815418384514)
+
+```
+  Tweet ID: `1973969815418384514`
+```
 {% include tweet.html tweet_id="1973969815418384514" %}
 
 **Optional parameters:**
@@ -113,13 +116,20 @@ To embed X posts (formerly Twitter), use:
 
 #### YouTube Embeds
 
-To embed YouTube videos with loading spinners and caching:
+To embed YouTube videos use:
 
 ```liquid
 {% include youtube.html video_id="VIDEO_ID" %}
 ```
 
 **Example:**
+The YouTube video ID is the unique identifier that comes after v= in a YouTube URL. Here are the different ways to extract it:
+
+[https://www.youtube.com/watch?v=dQw4w9WgXcQ](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+   ```
+   Video ID: `dQw4w9WgXcQ`
+   ```
+
 {% include youtube.html video_id="dQw4w9WgXcQ" %}
 
 **Optional parameters:**
@@ -129,11 +139,6 @@ To embed YouTube videos with loading spinners and caching:
 - `autoplay`: "1" or "0" (default: "0")
 - `start`: Start time in seconds
 
-#### Additional Markdown Features
-
-For more advanced Markdown features, see the [GitHub Flavored Markdown documentation](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-
 ### Add New Pages
 
 Create new `.md` files in the root directory. Each file with a `title` will automatically appear in the navigation menu.
@@ -142,8 +147,6 @@ Example:
 ```yaml
 ---
 title: Workforce
-description: State workforce and employment data
-permalink: /workforce/
 layout: page
 ---
 
@@ -159,94 +162,6 @@ layout: page
 - Start with [DOGE Network Tables Repository](https://github.com/DOGE-network/tables)
 - Connect with people on [community@dogenetwork.org](mailto:community@dogenetwork.org) for ideas
 
-## Template Updates & Syncing
-
-**This is the source template** that state sites sync FROM. When updates are released (v0.3.0, v0.4.0, etc.), state sites can review and adopt improvements.
-
-### Sync Workflow
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  DOGE Network Template (Source)                             │
-│  github.com/DOGE-network/DOGE_Network_Ruby_Template         │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-                     │ New Release (v0.3.0)
-                     ↓
-           ┌─────────────────────┐
-           │   ruby sync.rb      │
-           └─────────┬───────────┘
-                     │
-         ┌───────────┴────────────┐
-         ↓                        ↓
-    ┌────────┐              ┌──────────┐
-    │ Compare│              │  Check   │
-    │  Files │              │Changelog │
-    └───┬────┘              └────┬─────┘
-        │                        │
-        └──────────┬─────────────┘
-                   ↓
-        ┌──────────────────────┐
-        │  Review Changes      │
-        │                      │
-        │  ✅ Safe to merge    │
-        │  ⚠️  Needs review    │
-        │  🔧 Template tools   │
-        └──────────┬───────────┘
-                   │
-         ┌─────────┴─────────┐
-         ↓                   ↓
-    ┌─────────┐         ┌─────────┐
-    │  Merge  │         │  Skip   │
-    │  Safe   │         │ Custom  │
-    │  Files  │         │ Content │
-    └────┬────┘         └────┬────┘
-         │                   │
-         └─────────┬─────────┘
-                   ↓
-        ┌──────────────────────┐
-        │  Your State Site     │
-        │  (Updated & Working) │
-        └──────────────────────┘
-```
-
-### Using the Sync Tool
-
-Check for template updates periodically:
-
-```bash
-ruby sync.rb
-```
-
-This interactive tool helps you:
-1. Check for new template releases
-2. Compare your files with latest template
-3. Identify what's safe to merge vs. what needs review
-4. View detailed file differences
-5. Read the changelog
-
-### Understanding File Categories
-
-- **✅ Safe to merge**: Files without state-specific content (styling, dependencies, tools)
-- **⚠️ Needs review**: Files with your state data (config, content pages)
-- **🔧 Template tools**: Safe to update (setup.rb, sync.rb, docs)
-
-See [CHANGELOG.md](CHANGELOG.md) for detailed version history and upgrade guidance.
-
-### Manual Sync (Advanced)
-
-For manual control:
-```bash
-# Setup template remote (run once)
-ruby sync.rb  # Choose option 4
-
-# Fetch and compare changes
-git fetch template
-git diff template/master -- _config.yml
-
-# Merge specific file (after reviewing!)
-git checkout template/master -- Gemfile
-```
 
 ## Deployment
 

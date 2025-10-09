@@ -96,6 +96,19 @@
   overflow: hidden;
 }
 
+/* YouTube embed alignment classes */
+.youtube-align-left {
+  text-align: left;
+}
+
+.youtube-align-center {
+  text-align: center;
+}
+
+.youtube-align-right {
+  text-align: right;
+}
+
 .youtube-embed iframe {
   position: absolute;
   top: 20px;

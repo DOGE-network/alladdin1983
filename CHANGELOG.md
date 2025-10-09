@@ -6,7 +6,7 @@ State sites can use this to understand what changed between versions and decide 
 
 ## [0.3.0] - 2025-10-06
 
-### ✨ Added
+### Enhanced media updates
 
 #### YouTube Embed Component
 - **`_includes/youtube.html`** - New component for embedding YouTube videos
@@ -21,32 +21,14 @@ State sites can use this to understand what changed between versions and decide 
   - Consistent with YouTube loading design
   - Improves user experience
 
-#### Template Contribution Feature
-- **Push improvements to template** - New option in `sync.rb` (option 6)
-  - Identify changes suitable for contributing back to template
-  - Interactive review of candidate files
-  - Automated contribution branch creation
-  - Manual contribution command guide
-  - Helps maintain template with improvements from state sites
-
 ### 🔄 Changed
 
 #### Documentation
 - **`README.md`** - Significantly enhanced with:
   - Better structured sections
   - Template contribution guidelines
-  - Detailed sync.rb usage examples
   - Improved setup instructions
   - More comprehensive troubleshooting
-
-#### Code Quality
-- **`sync.rb`** - Improved Ruby code style
-  - Added `require "English"` for better $CHILD_STATUS handling
-  - String literals frozen with `.freeze`
-  - Consistent double quotes instead of single quotes
-  - Better error handling with `StandardError`
-  - Cleaner conditionals (`unless` instead of `if !`)
-  - Improved hash alignment and readability
 
 - **`setup.rb`** - Code style improvements
   - Consistent string quoting
@@ -57,17 +39,15 @@ State sites can use this to understand what changed between versions and decide 
 #### Duplicate Files
 - **`assets/css/main.scss`** - Removed duplicate SCSS file
   - Consolidated into `assets/main.scss`
-  - Eliminates confusion about which file to edit
-  - Cleaner project structure
 
 ### 📊 File Changes Summary
 
 Files modified:
 - `README.md` (+159 lines) - Enhanced documentation
 - `_includes/tweet.html` (+113 lines) - Added loading spinner
-- `sync.rb` (+555 lines) - Major improvements with contribution feature
 - `assets/main.scss` (+38 lines) - Consolidated SCSS
 - `setup.rb` (+22 lines) - Code style improvements
+- `CHANGELOG.md` - this file
 
 Files added:
 - `_includes/youtube.html` (+73 lines) - New component
@@ -75,26 +55,11 @@ Files added:
 Files removed:
 - `assets/css/main.scss` (-80 lines) - Duplicate removed
 
-### 🎯 For State Sites
-
-**Safe to merge:**
-- `_includes/tweet.html` - Loading spinner enhancement
-- `_includes/youtube.html` - New component (if you need YouTube embeds)
-- `assets/main.scss` - Consolidated SCSS (remove old `assets/css/main.scss`)
-- `sync.rb` - Tool improvements (including new push-to-template feature)
-- `setup.rb` - Code style updates
-
-**Review carefully:**
-- `README.md` - May have state-specific content, merge template improvements selectively
-
-**Action required:**
-- If you have `assets/css/main.scss`, delete it and use `assets/main.scss` instead
-
 ---
 
 ## [0.2.0] - 2025-10-05
 
-### 🎉 Major: Template System Released
+### Template System Released
 
 Converted from Kansas DOGE v0.1.0 into a reusable template for all state DOGE sites.
 
@@ -119,15 +84,8 @@ Converted from Kansas DOGE v0.1.0 into a reusable template for all state DOGE si
   - Automatically replaces template variables
   - Provides next steps guidance
 
-- **`sync.rb`** - Tool to sync template updates to your state site
-  - Check for template updates
-  - Compare your files with latest template
-  - Identify safe vs. needs-review changes
-  - Setup git remote for manual control
-
 #### Documentation
 - **`CHANGELOG.md`** (this file) - Version history
-- **`UPGRADE_FROM_v0.1.0.md`** - Guide for existing v0.1.0 sites
 - Enhanced **`README.md`** with template usage instructions
 
 ### 🔄 Changed
@@ -158,17 +116,6 @@ Converted from Kansas DOGE v0.1.0 into a reusable template for all state DOGE si
 
 #### Assets
 - Renamed `Flag_of_Kansas.svg` → `state-flag.svg` for generic placeholder
-
-### 📖 For State Sites Using v0.1.0
-
-If you're running a state site based on Kansas DOGE v0.1.0, see **`UPGRADE_FROM_v0.1.0.md`** for upgrade instructions.
-
-**Key decisions when upgrading:**
-
-1. **Configuration** - Update `_config.yml` to add template tracking
-2. **Content** - Your state-specific content stays, but structure improves
-3. **Tools** - Gain `setup.rb` and `sync.rb` for easier maintenance
-4. **Future updates** - Can now easily sync template improvements
 
 ### 🔒 Backward Compatibility
 
@@ -237,24 +184,15 @@ This template follows semantic versioning:
 ### Check for Updates
 
 ```bash
-ruby sync.rb
-```
-
-### Compare Specific Files
-
-```bash
-git remote add template https://github.com/DOGE-network/DOGE_Network_Ruby_Template.git
-git fetch template
-git diff template/main -- _config.yml
+git diff template/master --name-only
 ```
 
 ### Review Before Merging
 
 Always review changes before merging template updates:
 1. Check this CHANGELOG for version notes
-2. Run `sync.rb` to see affected files
-3. Test in a branch before merging to main
-4. Preserve your state-specific customizations
+2. Test in a branch before merging to master
+3. Preserve your state-specific customizations
 
 ---
 
