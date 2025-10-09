@@ -1,6 +1,6 @@
 # DOGE Network Ruby Template
 
-[![Version](https://img.shields.io/badge/Version-0.3.0-orange.svg)](https://github.com/DOGE-network/DOGE_Network_Ruby_Template)
+[![Version](https://img.shields.io/badge/Version-0.3.1-orange.svg)](https://github.com/DOGE-network/DOGE_Network_Ruby_Template)
 [![Template](https://img.shields.io/badge/Template-DOGE%20Network%20Ruby-brightgreen.svg)](https://dogenetwork.org/)
 [![Jekyll](https://img.shields.io/badge/Jekyll-4.3.4-blue.svg)](https://jekyllrb.com/)
 [![Ruby](https://img.shields.io/badge/Ruby-3.3.0-red.svg)](https://www.ruby-lang.org/)
