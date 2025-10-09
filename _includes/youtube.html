@@ -22,7 +22,8 @@
   {% assign youtube_url = youtube_url | append: '?autoplay=1' %}
 {% endif %}
 
-<div class="youtube-embed" style="text-align: {{ include.align | default: 'center' }}; margin: 20px 0;">
+{% assign align_value = include.align | default: 'center' %}
+<div class="youtube-embed youtube-align-{{ align_value }}" style="margin: 20px 0;">
   <!-- Loading spinner -->
   <div class="loading-spinner" id="youtube-spinner-{{ include.video_id }}">
     <div class="spinner"></div>
