@@ -26,8 +26,8 @@
 <script>
 (function() {
   const tweetId = '{{ include.tweet_id }}';
-  const tweetEmbed = document.querySelector('[data-align]');
   const spinner = document.getElementById('tweet-spinner-' + tweetId);
+  const tweetEmbed = spinner.parentElement;
   const tweetBlock = spinner.nextElementSibling;
   
   // Apply alignment from data attribute

@@ -1,7 +1,7 @@
 ---
 layout: default
 ---
-<!--
+{% comment %}
 Use this syntax for formatting:
 - **Headers**: `# H1`, `## H2`, `### H3`, etc.
 - **Text**: `**bold**`, `*italic*`, `~~strikethrough~~`, `` `code` ``
@@ -13,7 +13,7 @@ Use this syntax for formatting:
 - **Code blocks**: Wrap in triple backticks with optional language
 - {% include tweet.html tweet_id="1973969815418384514" %}
 - {% include youtube.html video_id="dQw4w9WgXcQ" %}
--->
+{% endcomment %}
 
 ## Network
 
